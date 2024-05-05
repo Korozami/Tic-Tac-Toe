@@ -116,7 +116,7 @@ function showGame () {
         const resultContainer = document.querySelector('.game-result');
         if(displayController.checkWinner()) {
             resultContainer.textContent = 'You Win'
-        } else if(turnCount >= 5) {
+        } else if(displayController.turnCount >= 5) {
             resultContainer.textContent = 'Tie game'
         } else {
             resultContainer.textContent = 'You Lose'
@@ -138,10 +138,14 @@ const replaceContent = () => {
 
 //restart game
 const buttonRestart = () => {
-    const btn = document.querySelector('.restart-btn');
-    btn.addEventListener('click', function () {
-        
-    })
+    let board = gameBoard;
+    let i = 0;
+    while(i < 3) {
+        board[i] = [null, null,null]
+        i++;
+    }
+    displayController.turnCount = 0;
+    replaceContent();
 }
 
 showGame();
