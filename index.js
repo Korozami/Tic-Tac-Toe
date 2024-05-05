@@ -6,7 +6,7 @@ const gameBoard = (function() {
     let board = [];
     let i = 0;
     while(i < 3) {
-        board.push(['x', 'x', 'x'])
+        board.push([null, null,null])
         i++;
     }
     return board;
@@ -36,20 +36,20 @@ const displayController = (function (playerOne = "You", playerTwo = "Comp", posi
         //check if rows are all the same
         for(let i = 0; i < 3; i++) {
             //checks if not null and if all of them have the same value
-            if(board[i][0] != null && board[i][0] === board[i][1] && board[i][0] === board[i][2]) console.log('You Win');
+            if(board[i][0] != null && board[i][0] === 'X' && board[i][0] === board[i][1] && board[i][0] === board[i][2]) return true;
         }
         //checks columns
         for(let i = 0; i < 3; i++) {
             //checks if not null and if all of them have the same value
-            if(board[0][i] != null && board[0][i] === board[1][i] && board[0][i] === board[2][i]) console.log('You Win');
+            if(board[0][i] != null && board[0][i] === 'X' && board[0][i] === board[1][i] && board[0][i] === board[2][i]) return true;
         }
         //checks diagnols
-        if(board[1][1] != null) {
-            if(board[0][0] === board[1][1] && board[1][1] === board[2][2]) console.log('You Win');
-            else if (board[0][2] === board[1][1] && board[1][1] === board[2][0]) console.log('You Win');
+        if(board[1][1] != null && board[1][1] === 'X') {
+            if(board[0][0] === board[1][1] && board[1][1] === board[2][2]) return true;
+            else if (board[0][2] === board[1][1] && board[1][1] === board[2][0]) return true;
         }
-        if(turnCount === 5) console.log('Tie game!')
-        // return false;
+        // if(turnCount === 5) console.log('Tie game!')
+        return false;
     }
 
     //player chooses where to place X
@@ -57,19 +57,14 @@ const displayController = (function (playerOne = "You", playerTwo = "Comp", posi
         if(playersTurn) {
             if(board[x][y] === null) {
                 board[x][y] = 'X';
-                turnCount++;
-                if(turnCount >= 3) {
-                    checkWinner();
-                }
                 playersTurn = false;
                 compTurn = true;
-            } else console.log('Bruh')
-        } else {
-            //AI sends message and runs its turn
-            console.log('AI: "Ayyy yooo its my turn"')
-            compChoice();
+                //AI runs its turn right after you
+                if(!checkWinner()) {
+                    compChoice();
+                }
+            }
         }
-
     };
 
     //computer choice
@@ -92,21 +87,61 @@ const displayController = (function (playerOne = "You", playerTwo = "Comp", posi
         }
     };
 
-    return {player, comp, playerChoice, getBoard, compChoice}
+    return {player, comp, playerChoice, getBoard, compChoice, checkWinner, turnCount}
 })();
 
 //show tic-tac-toe board
-// function showGame () {
-//     let board = gameBoard;
-//     const content = document.querySelector('.game-content');
-//     console.log(board)
-//     board.forEach((el, i) => {
-//         console.log(el, i)
-//         const item = document.createElement('div');
-//         item.classList.add('itemContent');
-//         console.log(item)
-//         content.appendChild(item);
-//     })
-// }
+function showGame () {
+    let board = gameBoard;
+    const content = document.querySelector('.game-content');
+    board.forEach((el,x) => {
+        el.forEach((box, y) => {
+            const item = document.createElement('div');
+            item.classList.add('itemContent');
+            if(box != null) {
+                item.textContent = `${box}`
+            }
+            if(!displayController.checkWinner()) {
+                item.addEventListener('click', function() {
+                    displayController.playerChoice(x,y);
+                    displayController.turnCount++;
+                    replaceContent();
+                });
+            }
+            content.appendChild(item);
+        })
+    });
 
-// showGame();
+    if(displayController.turnCount >= 3) {
+        const resultContainer = document.querySelector('.game-result');
+        if(displayController.checkWinner()) {
+            resultContainer.textContent = 'You Win'
+        } else if(turnCount >= 5) {
+            resultContainer.textContent = 'Tie game'
+        } else {
+            resultContainer.textContent = 'You Lose'
+        }
+    }
+};
+
+//replace board with accurate outputs
+const replaceContent = () => {
+    const content = document.querySelector(".game-content");
+    // console.log(items)
+
+    while(content.firstChild) {
+        content.removeChild(content.firstChild);
+    }
+
+    showGame();
+}
+
+//restart game
+const buttonRestart = () => {
+    const btn = document.querySelector('.restart-btn');
+    btn.addEventListener('click', function () {
+        
+    })
+}
+
+showGame();
