@@ -6,7 +6,7 @@ const gameBoard = (function() {
     let board = [];
     let i = 0;
     while(i < 3) {
-        board.push([null, null, null])
+        board.push(['x', 'x', 'x'])
         i++;
     }
     return board;
@@ -29,12 +29,38 @@ const displayController = (function (playerOne = "You", playerTwo = "Comp", posi
     const getBoard = () => board;
     let playersTurn = true;
     let compTurn = false;
+    let turnCount = 0;
+
+    //check winner or tie
+    const checkWinner = () => {
+        //check if rows are all the same
+        for(let i = 0; i < 3; i++) {
+            //checks if not null and if all of them have the same value
+            if(board[i][0] != null && board[i][0] === board[i][1] && board[i][0] === board[i][2]) console.log('You Win');
+        }
+        //checks columns
+        for(let i = 0; i < 3; i++) {
+            //checks if not null and if all of them have the same value
+            if(board[0][i] != null && board[0][i] === board[1][i] && board[0][i] === board[2][i]) console.log('You Win');
+        }
+        //checks diagnols
+        if(board[1][1] != null) {
+            if(board[0][0] === board[1][1] && board[1][1] === board[2][2]) console.log('You Win');
+            else if (board[0][2] === board[1][1] && board[1][1] === board[2][0]) console.log('You Win');
+        }
+        if(turnCount === 5) console.log('Tie game!')
+        // return false;
+    }
 
     //player chooses where to place X
     const playerChoice = (x,y) => {
         if(playersTurn) {
             if(board[x][y] === null) {
                 board[x][y] = 'X';
+                turnCount++;
+                if(turnCount >= 3) {
+                    checkWinner();
+                }
                 playersTurn = false;
                 compTurn = true;
             } else console.log('Bruh')
@@ -68,3 +94,19 @@ const displayController = (function (playerOne = "You", playerTwo = "Comp", posi
 
     return {player, comp, playerChoice, getBoard, compChoice}
 })();
+
+//show tic-tac-toe board
+// function showGame () {
+//     let board = gameBoard;
+//     const content = document.querySelector('.game-content');
+//     console.log(board)
+//     board.forEach((el, i) => {
+//         console.log(el, i)
+//         const item = document.createElement('div');
+//         item.classList.add('itemContent');
+//         console.log(item)
+//         content.appendChild(item);
+//     })
+// }
+
+// showGame();
