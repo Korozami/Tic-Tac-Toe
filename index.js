@@ -9,7 +9,16 @@ const gameBoard = (function() {
         board.push([null, null,null])
         i++;
     }
-    return board;
+
+    const resetBoard = () => {
+        let i = 0;
+        while(i < 3) {
+            board[i] = [null, null, null]
+            i++;
+        }
+        return board
+    }
+    return {board, resetBoard};
 })();
 
 //creates User
@@ -22,14 +31,13 @@ function User (name, position) {
 
 //creates the flow of game??????
 const displayController = (function (playerOne = "You", playerTwo = "Comp", position = 'X', positionTwo = 'O') {
-    let board = gameBoard;
+    let board = gameBoard.board;
     const player = User(playerOne, position);
     const comp = User(playerTwo, positionTwo);
 
     const getBoard = () => board;
-    let playersTurn = true;
-    let compTurn = false;
     let turnCount = 0;
+    let compTurn = false;
 
     //check winner or tie
     const checkWinner = () => {
@@ -73,19 +81,16 @@ const displayController = (function (playerOne = "You", playerTwo = "Comp", posi
 
     //player chooses where to place X
     const playerChoice = (x,y) => {
-        if(playersTurn) {
-            if(board[x][y] === null) {
-                board[x][y] = 'X';
-                playersTurn = false;
+        if(board[x][y] === null) {
+            board[x][y] = 'X';
+            //AI runs its turn right after you
+            if(turnCount < 4) {
                 compTurn = true;
-                //AI runs its turn right after you
-                if(!checkWinner()) {
-                    compChoice();
-                }
-                return true;
-            } else {
-                return false
-            }
+                compChoice();
+            };
+            return true;
+        } else {
+            return false
         }
     };
 
@@ -97,10 +102,8 @@ const displayController = (function (playerOne = "You", playerTwo = "Comp", posi
             let y = Math.floor(Math.random() * 3);
             //place board if null
             if(board[x][y] === null) {
-                board[x][y] = 'O'
-                //return it back to players turns
-                playersTurn = true;
-                compTurn = false
+                board[x][y] = 'O';
+                compTurn = false;
             }
         }
         //runs computer function to place on board until its not the computers turn anymore
@@ -114,7 +117,7 @@ const displayController = (function (playerOne = "You", playerTwo = "Comp", posi
 
 //show tic-tac-toe board
 function showGame () {
-    let board = gameBoard;
+    let board = gameBoard.board;
     const content = document.querySelector('.game-content');
     board.forEach((el,x) => {
         el.forEach((box, y) => {
@@ -125,14 +128,16 @@ function showGame () {
             }
             if(!displayController.checkWinner() && !displayController.checkLost()) {
                 item.addEventListener('click', function() {
+                    console.log(displayController.playersTurn)
+                    console.log(displayController.compTurn)
                     if(displayController.playerChoice(x,y)) {
                         displayController.playerChoice(x,y);
                         displayController.turnCount++;
                         replaceContent();
-                        console.log(displayController.checkLost());
-                        console.log(displayController.checkWinner());
-                        console.log(board);
+                        console.log('broken?')
                     }
+                    console.log(board)
+                    console.log('working')
                 });
             }
             content.appendChild(item);
@@ -166,18 +171,11 @@ const replaceContent = () => {
 //restart game
 const buttonRestart = () => {
     const resultContainer = document.querySelector('.game-result');
-    let board = gameBoard;
-    let i = 0;
-    while(i < 3) {
-        board[i] = [null, null,null]
-        i++;
-    }
-    console.log(board)
+    gameBoard.resetBoard();
     displayController.turnCount = 0;
     resultContainer.textContent = '';
+    // displayController.playersTurn = true;
     replaceContent();
-    console.log(displayController.checkLost());
-    console.log(displayController.checkWinner());
 }
 
 showGame();
