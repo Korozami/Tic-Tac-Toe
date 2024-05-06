@@ -48,7 +48,26 @@ const displayController = (function (playerOne = "You", playerTwo = "Comp", posi
             if(board[0][0] === board[1][1] && board[1][1] === board[2][2]) return true;
             else if (board[0][2] === board[1][1] && board[1][1] === board[2][0]) return true;
         }
-        // if(turnCount === 5) console.log('Tie game!')
+        return false;
+    }
+
+    //check if you lost
+    const checkLost = () => {
+        //check if rows are all the same
+        for(let i = 0; i < 3; i++) {
+            //checks if not null and if all of them have the same value
+            if(board[i][0] != null && board[i][0] === 'O' && board[i][0] === board[i][1] && board[i][0] === board[i][2]) return true;
+        }
+        //checks columns
+        for(let i = 0; i < 3; i++) {
+            //checks if not null and if all of them have the same value
+            if(board[0][i] != null && board[0][i] === 'O' && board[0][i] === board[1][i] && board[0][i] === board[2][i]) return true;
+        }
+        //checks diagnols
+        if(board[1][1] != null && board[1][1] === 'O') {
+            if(board[0][0] === board[1][1] && board[1][1] === board[2][2]) return true;
+            else if (board[0][2] === board[1][1] && board[1][1] === board[2][0]) return true;
+        }
         return false;
     }
 
@@ -63,6 +82,9 @@ const displayController = (function (playerOne = "You", playerTwo = "Comp", posi
                 if(!checkWinner()) {
                     compChoice();
                 }
+                return true;
+            } else {
+                return false
             }
         }
     };
@@ -87,7 +109,7 @@ const displayController = (function (playerOne = "You", playerTwo = "Comp", posi
         }
     };
 
-    return {player, comp, playerChoice, getBoard, compChoice, checkWinner, turnCount}
+    return {player, comp, playerChoice, getBoard, compChoice, checkWinner, turnCount, checkLost}
 })();
 
 //show tic-tac-toe board
@@ -101,11 +123,16 @@ function showGame () {
             if(box != null) {
                 item.textContent = `${box}`
             }
-            if(!displayController.checkWinner()) {
+            if(!displayController.checkWinner() && !displayController.checkLost()) {
                 item.addEventListener('click', function() {
-                    displayController.playerChoice(x,y);
-                    displayController.turnCount++;
-                    replaceContent();
+                    if(displayController.playerChoice(x,y)) {
+                        displayController.playerChoice(x,y);
+                        displayController.turnCount++;
+                        replaceContent();
+                        console.log(displayController.checkLost());
+                        console.log(displayController.checkWinner());
+                        console.log(board);
+                    }
                 });
             }
             content.appendChild(item);
@@ -115,11 +142,11 @@ function showGame () {
     if(displayController.turnCount >= 3) {
         const resultContainer = document.querySelector('.game-result');
         if(displayController.checkWinner()) {
-            resultContainer.textContent = 'You Win'
-        } else if(displayController.turnCount >= 5) {
-            resultContainer.textContent = 'Tie game'
-        } else {
-            resultContainer.textContent = 'You Lose'
+            resultContainer.textContent = 'You Win';
+        } else if(displayController.turnCount >= 6) {
+            resultContainer.textContent = 'Tie game';
+        } else if (displayController.checkLost()) {
+            resultContainer.textContent = 'You Lose';
         }
     }
 };
@@ -138,14 +165,19 @@ const replaceContent = () => {
 
 //restart game
 const buttonRestart = () => {
+    const resultContainer = document.querySelector('.game-result');
     let board = gameBoard;
     let i = 0;
     while(i < 3) {
         board[i] = [null, null,null]
         i++;
     }
+    console.log(board)
     displayController.turnCount = 0;
+    resultContainer.textContent = '';
     replaceContent();
+    console.log(displayController.checkLost());
+    console.log(displayController.checkWinner());
 }
 
 showGame();
